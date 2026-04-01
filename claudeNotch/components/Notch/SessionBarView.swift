@@ -7,6 +7,7 @@
 
 import Defaults
 import SwiftUI
+import Defaults
 
 /// Compact session progress bar shown below the notch in closed state
 struct SessionBarView: View {
@@ -15,6 +16,7 @@ struct SessionBarView: View {
     var isHovering: Bool = false
     var hasWarning: Bool = false
     @ObservedObject private var extraUsage = ExtraUsageService.shared
+    @ObservedObject private var statusService = ClaudeStatusService.shared
 
     var body: some View {
         HStack(spacing: 6) {
@@ -27,6 +29,13 @@ struct SessionBarView: View {
                 Image(systemName: "bolt.fill")
                     .font(.system(size: 9, weight: .bold))
                     .foregroundColor(.yellow)
+            }
+
+            // Service status warning (only when there's an issue)
+            if Defaults[.showServiceStatusIndicator], statusService.currentStatus.worstRelevantStatus == .majorOutage {
+                Image(systemName: statusService.currentStatus.worstRelevantStatus.systemImage)
+                    .font(.system(size: 9, weight: .bold))
+                    .foregroundColor(statusService.currentStatus.worstRelevantStatus.color)
             }
 
             // Progress bar
